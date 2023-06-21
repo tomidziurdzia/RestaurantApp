@@ -9,9 +9,11 @@ const NuevoPlatillo = () => {
   const [subiendo, setSubiendo] = useState(false);
   const [progreso, setProgreso] = useState(0);
   const [urlImagen, setUrlImagen] = useState("");
+
   // Context con operaciones de firebase
   const { firebase } = useContext(FirebaseContext);
   const navigate = useNavigate();
+
   //Validacion y leer datos
   const formik = useFormik({
     initialValues: {
@@ -186,6 +188,23 @@ const NuevoPlatillo = () => {
                 onProgress={handleProgress}
               />
             </div>
+
+            {subiendo && (
+              <div className="h-12 relative border">
+                <div
+                  className="bg-green-500 absolute left-0 top-0 text-white px-2 text-sm h-12 flex items-center"
+                  style={{ width: `${progreso}%` }}
+                >
+                  {progreso} %
+                </div>
+              </div>
+            )}
+
+            {urlImagen && (
+              <p className="bg-green-500 text-white p-3 text-center my-5">
+                La imagen se subio correctamente
+              </p>
+            )}
 
             <div className="mb-4">
               <label
