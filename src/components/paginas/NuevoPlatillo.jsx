@@ -1,14 +1,17 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
 import { FirebaseContext } from "../../firebase";
 import { useNavigate } from "react-router-dom";
+import FileUploaded from "react-firebase-file-uploader";
 
 const NuevoPlatillo = () => {
+  const [subiendo, setSubiendo] = useState(false);
+  const [progreso, setProgreso] = useState(0);
+  const [urlImagen, setUrlImagen] = useState("");
   // Context con operaciones de firebase
   const { firebase } = useContext(FirebaseContext);
   const navigate = useNavigate();
-
   //Validacion y leer datos
   const formik = useFormik({
     initialValues: {
@@ -34,6 +37,7 @@ const NuevoPlatillo = () => {
     onSubmit: (platillo) => {
       try {
         platillo.existencia = true;
+        platillo.imagen = urlImagen;
         firebase.db.collection("productos").add(platillo);
         navigate("/menu");
       } catch (error) {
@@ -41,6 +45,31 @@ const NuevoPlatillo = () => {
       }
     },
   });
+
+  const handleUploadStart = () => {
+    setProgreso(0);
+    setSubiendo(true);
+  };
+  const handleUploadError = (error) => {
+    setSubiendo(false);
+    console.log(error);
+  };
+  const handleUploadSuccess = async (nombre) => {
+    setProgreso(100);
+    setSubiendo(false);
+
+    // Almacenar la url de destino
+    const url = await firebase.storage
+      .ref("productos")
+      .child(nombre)
+      .getDownloadURL();
+    console.log(url);
+    setUrlImagen(url);
+  };
+  const handleProgress = (progreso) => {
+    setProgreso(progreso);
+    console.log(progreso);
+  };
 
   return (
     <>
@@ -145,13 +174,16 @@ const NuevoPlatillo = () => {
               >
                 Imagen
               </label>
-              <input
-                type="file"
+              <FileUploaded
+                accept="image/*"
                 id="imagen"
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none"
-                value={formik.values.imagen}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
+                name="imagen"
+                randomizeFilename
+                storageRef={firebase.storage.ref("productos")}
+                onUploadStart={handleUploadStart}
+                onUploadError={handleUploadError}
+                onUploadSuccess={handleUploadSuccess}
+                onProgress={handleProgress}
               />
             </div>
 
