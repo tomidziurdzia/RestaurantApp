@@ -1,8 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import { FirebaseContext } from "../../firebase";
+import { useNavigate } from "react-router-dom";
 
 const NuevoPlatillo = () => {
+  // Context con operaciones de firebase
+  const { firebase } = useContext(FirebaseContext);
+  const navigate = useNavigate();
+
   //Validacion y leer datos
   const formik = useFormik({
     initialValues: {
@@ -25,8 +31,14 @@ const NuevoPlatillo = () => {
         .required("La descripcion es obligatoria"),
     }),
 
-    onSubmit: (datos) => {
-      console.log(datos);
+    onSubmit: (platillo) => {
+      try {
+        platillo.existencia = true;
+        firebase.db.collection("productos").add(platillo);
+        navigate("/menu");
+      } catch (error) {
+        console.log(error);
+      }
     },
   });
 

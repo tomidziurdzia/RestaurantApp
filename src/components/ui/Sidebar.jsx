@@ -13,12 +13,14 @@ const Sidebar = () => {
         </p>
         <nav className="mt-10">
           <NavLink
+            exact="true"
             className="nav-link p-1 text-gray-400 block hover:bg-yellow-500 hover:text-gray-600"
             to="/"
           >
             Ordenes
           </NavLink>
           <NavLink
+            exact="true"
             className="nav-link p-1 text-gray-400 block hover:bg-yellow-500 hover:text-gray-600"
             to="/menu"
           >
